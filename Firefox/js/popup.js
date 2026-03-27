@@ -1303,6 +1303,9 @@ function gatherSpells(data, characterData) {
         for (let i = 0; i < data.spells[area].length; i++) {
             const spell = data.spells[area][i];
             const definition = spell.definition;
+            if (definition == null) {
+                continue;
+            }
             const activation = definition.activation;
             const duration = definition.duration;
 
