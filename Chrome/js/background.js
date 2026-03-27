@@ -125,6 +125,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         return true;  // For async response
     }
+
     if (message.type === 'APPLY_HEALING') {
         chrome.scripting.executeScript({
             target: { tabId: sender.tab.id },

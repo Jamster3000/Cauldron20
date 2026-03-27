@@ -4417,7 +4417,9 @@ function addSpellToContainer(spell, container) {
 			}
 		}
 
-		const castingMessage = `Casting: ${spell.Definition.Name}`;
+		const spellName = spell.Definition.Name;
+
+		const castingMessage = `[spell]${spellName}[/spell]`;
 		sendDataToSidebar(castingMessage, characterData.Name);
 
 		// spell slot usage
