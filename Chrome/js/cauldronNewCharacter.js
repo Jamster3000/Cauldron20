@@ -1,7 +1,7 @@
 // chromeium cauldronNewCharacter.js
 
 setTimeout(function () {
-    const nameInput = document.getElementById('name');
+    const nameInput = document.querySelectorAll('#name')[1];
     const hitPoints = document.getElementById('hitpoints');
     const armourClass = document.getElementById('armor_class');
     const initiative = document.getElementById('initiative');
