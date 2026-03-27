@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // Fetch character info when the button is clicked
     document.getElementById('fetchButton').addEventListener('click', function () {
         showSpinner();
@@ -1304,6 +1304,9 @@ function gatherSpells(data, characterData) {
         for (let i = 0; i < data.spells[area].length; i++) {
             const spell = data.spells[area][i];
             const definition = spell.definition;
+            if (definition == null){
+                continue;
+            }
             const activation = definition.activation;
             const duration = definition.duration;
 
