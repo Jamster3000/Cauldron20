@@ -2742,11 +2742,16 @@ function convertDiceNotation(text) {
     });
 }
 
-//This will handle and replace strings like "{{(modifier:cha+classlevel)@min:1#unsigned}"
+//This will handle and replace strings like "{{(modifier:cha+classlevel)@min:1#unsigned}", "{{ classlevel }}", "{{ scalevalue }}"
 function processTemplateString(templateString, characterData) {
     if (!templateString || !templateString.includes('{{')) return templateString;
 
     return templateString.replace(/{{(.*?)}}/g, (match, expression) => {
+        const trimmedExpression = expression.trim();
+
+        if (trimmedExpression === 'classlevel') { return characterData.Level.toString(); }
+        if (trimmedExpression === 'scalevalue') { return characterData.Level.toString(); }
+
         if (expression.includes('modifier:cha+classlevel')) {
             const charismaMod = characterData.AbilityScores.Modifier.Charisma;
             const classLevel = characterData.Level;
