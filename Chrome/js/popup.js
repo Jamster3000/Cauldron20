@@ -2748,7 +2748,7 @@ function processTemplateString(templateString, characterData) {
 
     return templateString.replace(/{{(.*?)}}/g, (match, expression) => {
         const trimmedExpression = expression.trim();
-        if (trimmedExpression === 'classlevel') { return characterData.Level.toString(); }s
+        if (trimmedExpression === 'classlevel') { return characterData.Level.toString(); }
         if (trimmedExpression === 'scalevalue') { return characterData.Level.toString(); }
 
         if (expression.includes('modifier:cha+classlevel')) {
