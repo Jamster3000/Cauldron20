@@ -349,93 +349,93 @@ function createCommonAction(adventureData) {
 	const style = document.createElement('style');
 	// Replace the current style.innerHTML in the createCommonAction function with this:
 	style.innerHTML = `
-		.check, .saving-throw, .actions, .spells-extention, .usable-items{
-			width: 224.2px;
-			margin-bottom: 5px;
-		}
+    .check, .saving-throw, .actions, .spells-extention, .usable-items{
+        width: 224.2px;
+        margin-bottom: 5px;
+    }
 
-		.menu-item {
-			position: relative;
-			width: 100%;
-			text-align: left;
-			margin-bottom: 5px;
-		}
+    .menu-item {
+        position: relative;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+    }
 
-		.menu-item > button::after {
-			content: '◀';
-			float: left;
-			font-size: 0.8em;
-			margin-top: 3px;
-		}
+    .menu-item > button::after {
+        content: '◀';
+        float: left;
+        font-size: 0.8em;
+        margin-top: 3px;
+    }
 
-		.submenu {
-			pointer-events: none;
-			position: absolute;
-			right: 100%;
-			top: 0;
-			background-color: #d0d0d0;
-			border: 1px solid #808080;
-			border-radius: 4px;
-			box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
-			z-index: 1014;
-			padding: 5px;
-			opacity: 0;
-			visibility: hidden;
-			transition: opacity ${Number(SUBMENU_APPEAR_TRANSITION)}s ease;
-		}
+    .submenu {
+        position: absolute;
+        right: 100%;
+        top: 0;
+        background-color: #d0d0d0;
+        border: 1px solid #808080;
+        border-radius: 4px;
+        box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
+        z-index: 1014;
+        padding: 5px;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity ${Number(SUBMENU_APPEAR_TRANSITION)}s ease, visibility ${Number(SUBMENU_APPEAR_TRANSITION)}s ease;
+    }
 
-		.submenu.show {
-			opacity: 1;
-			visibility: visible;
-			pointer-events: auto;
-		}
+    .submenu.show {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
 
-		.menu-item::after {
-			content: '';
-			position: absolute;
-			top: 0;
-			right: -20px;
-			width: 20px;
-			height: 100%;
-		}
-    
-		.submenu::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			right: -10px;
-			width: 10px;
-			height: 100%;
-		}
+    .menu-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -20px;
+        width: 20px;
+        height: 100%;
+    }
 
-		.menu-item:hover .submenu {
-			display: block;
-		}
-    
-		.submenu:hover {
-			display: block;
-		}
+    .submenu::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -10px;
+        width: 10px;
+        height: 100%;
+    }
 
-		.submenu-item {
-			height: 20px;
-			width: 152.1px;
-			cursor: pointer;
-			white-space: normal;
-			word-wrap: normal;
-		}
+    .menu-item:hover .submenu {
+        display: block;
+    }
 
-		.submenu hr {
-			margin: 5px;
-			border-top: 1px solid #dee2e6;
-		}
+    .submenu:hover {
+        display: block;
+    }
 
-		.submenu-item-button {
-			display: flex;
-			align-items: flex-start;
-			padding-top: 0;
-			padding-right: 0;
-		}
-	`;
+    .submenu-item {
+        height: 20px;
+        width: 152.1px;
+        cursor: pointer;
+        white-space: normal;
+        word-wrap: normal;
+    }
+
+    .submenu hr {
+        margin: 5px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .submenu-item-button {
+        display: flex;
+        align-items: flex-start;
+        padding-top: 0;
+        padding-right: 0;
+    }
+`;
 	document.head.appendChild(style);
 
 	//build structure of the menu
@@ -497,10 +497,21 @@ function createCommonAction(adventureData) {
 
 	addTitlesToAllButtons();
 
-	document.addEventListener('click', function (event) {
-		overlayContainer.remove();
-		CommonActionMenuOpen = false;
-	});
+	if (commonActionClickListener) {
+		document.removeEventListener('click', commonActionClickListener);
+	}
+
+	commonActionClickListener = function (event) {
+		// Only remove if clicking OUTSIDE the menu
+		if (!overlayContainer.contains(event.target)) {
+			overlayContainer.remove();
+			CommonActionMenuOpen = false;
+			document.removeEventListener('click', commonActionClickListener);
+			commonActionClickListener = null;
+		}
+	};
+
+	document.addEventListener('click', commonActionClickListener);
 
 	//Shows the submenu applying the "show" class & ensures that there are no other submenus already visible
 	document.querySelectorAll('.menu-item').forEach(item => {
@@ -538,51 +549,8 @@ function createCommonAction(adventureData) {
 
 	const actions = document.getElementById('actions');
 
-	for (let i = 0; i < Object.keys(characterData.Inventory).length; i++) {
-		if (characterData.Inventory[i].Definition.FilterType === "Weapon" || characterData.Inventory[i].Definition.FilterType === "Rod" || characterData.Inventory[i].Definition.FilterType === "Staff") {
-			const name = characterData.Inventory[i].Definition.Name;
-			const range = "Range: " + (characterData.Inventory[i].Definition.Range || 5) + "/" + (characterData.Inventory[i].Definition.LongRange || 5) + "ft.";
-			const attackRoll = characterData.Inventory[i].Definition.AttackRoll;
-			const damage = characterData.Inventory[i].Definition.DamageRoll;
-
-			const weaponButton = document.createElement('button');
-			weaponButton.textContent = name;
-			weaponButton.title = range + " - Attack Roll: " + attackRoll + " - Damage: " + damage + " - Double click for damage roll";
-			weaponButton.classList.add('submenu-item', 'submenu-item-button', 'btn', 'btn-default', 'btn-sm');
-			weaponButton.style.fontWeight = 'bold';
-
-			let clickTimeout;
-
-			weaponButton.addEventListener('click', function(event) {
-				if (clickTimeout) {
-					clearTimeout(clickTimeout);
-					clickTimeout = null;
-					document.body.prepend(document.querySelector('div#dice-box'));
-					document.querySelector('div#dice-box').style.zIndex = '';
-					// Handle double click
-					overlayContainer.remove();
-					CommonActionMenuOpen = false;
-					roll_dice(damage);
-				} else {
-					clickTimeout = setTimeout(() => {
-						clickTimeout = null;
-						document.body.prepend(document.querySelector('div#dice-box'));
-						document.querySelector('div#dice-box').style.zIndex = '';
-						overlayContainer.remove();
-						CommonActionMenuOpen = false;
-						roll_dice(attackRoll, event);
-					}, 200);
-				}
-			});
-
-			actions.appendChild(weaponButton);
-		}
-	}
-
-	document.addEventListener('click', commonActionClickListener);
-
 	document.querySelectorAll('.submenu-item-button').forEach(button => {
-		button.addEventListener('click', function(event) {
+		button.addEventListener('click', function (event) {
 			const target = event.target.closest('button');
 			if (!target) return;
 
@@ -606,6 +574,7 @@ function createCommonAction(adventureData) {
 					document.querySelector('div#dice-box').style.zIndex = '';
 					overlayContainer.remove();
 					CommonActionMenuOpen = false;
+					console.log(`1d20+${characterData.AbilityScores.Modifier.Dexterity}`);
 					roll_dice(`1d20+${characterData.AbilityScores.Modifier.Dexterity}`, event);
 					break;
 				case 'Constitution Check':
@@ -680,7 +649,7 @@ function createCommonAction(adventureData) {
 					document.querySelector('div#dice-box').style.zIndex = '';
 					overlayContainer.remove();
 					CommonActionMenuOpen = false;
-					roll_dice(`1d20+${characterData.SavingThrows.Charisma.total}, event`);
+					roll_dice(`1d20+${characterData.SavingThrows.Charisma.total}`, event);
 					break;
 
 				//checks
@@ -855,6 +824,47 @@ function createCommonAction(adventureData) {
 		CommonActionMenuOpen = false;
 		roll_dice(`1d20+${spellAttack}`, event);
 	});
+
+	for (let i = 0; i < Object.keys(characterData.Inventory).length; i++) {
+		if (characterData.Inventory[i].Definition.FilterType === "Weapon" || characterData.Inventory[i].Definition.FilterType === "Rod" || characterData.Inventory[i].Definition.FilterType === "Staff") {
+			const name = characterData.Inventory[i].Definition.Name;
+			const range = "Range: " + (characterData.Inventory[i].Definition.Range || 5) + "/" + (characterData.Inventory[i].Definition.LongRange || 5) + "ft.";
+			const attackRoll = characterData.Inventory[i].Definition.AttackRoll;
+			const damage = characterData.Inventory[i].Definition.DamageRoll;
+
+			const weaponButton = document.createElement('button');
+			weaponButton.textContent = name;
+			weaponButton.title = range + " - Attack Roll: " + attackRoll + " - Damage: " + damage + " - Double click for damage roll";
+			weaponButton.classList.add('submenu-item', 'submenu-item-button', 'btn', 'btn-default', 'btn-sm');
+			weaponButton.style.fontWeight = 'bold';
+
+			let clickTimeout;
+
+			weaponButton.addEventListener('click', function (event) {
+				if (clickTimeout) {
+					clearTimeout(clickTimeout);
+					clickTimeout = null;
+					document.body.prepend(document.querySelector('div#dice-box'));
+					document.querySelector('div#dice-box').style.zIndex = '';
+					// Handle double click
+					overlayContainer.remove();
+					CommonActionMenuOpen = false;
+					roll_dice(damage);
+				} else {
+					clickTimeout = setTimeout(() => {
+						clickTimeout = null;
+						document.body.prepend(document.querySelector('div#dice-box'));
+						document.querySelector('div#dice-box').style.zIndex = '';
+						overlayContainer.remove();
+						CommonActionMenuOpen = false;
+						roll_dice(attackRoll, event);
+					}, 200);
+				}
+			});
+
+			actions.appendChild(weaponButton);
+		}
+	}
 }
 
 function addTitlesToAllButtons() {

@@ -538,47 +538,6 @@ function createCommonAction(adventureData) {
 
 	const actions = document.getElementById('actions');
 
-	for (let i = 0; i < Object.keys(characterData.Inventory).length; i++) {
-		if (characterData.Inventory[i].Definition.FilterType === "Weapon" || characterData.Inventory[i].Definition.FilterType === "Rod" || characterData.Inventory[i].Definition.FilterType === "Staff") {
-			const name = characterData.Inventory[i].Definition.Name;
-			const range = "Range: " + (characterData.Inventory[i].Definition.Range || 5) + "/" + (characterData.Inventory[i].Definition.LongRange || 5) + "ft.";
-			const attackRoll = characterData.Inventory[i].Definition.AttackRoll;
-			const damage = characterData.Inventory[i].Definition.DamageRoll;
-
-			const weaponButton = document.createElement('button');
-			weaponButton.textContent = name;
-			weaponButton.title = range + " - Attack Roll: " + attackRoll + " - Damage: " + damage + " - Double click for damage roll";
-			weaponButton.classList.add('submenu-item', 'submenu-item-button', 'btn', 'btn-default', 'btn-sm');
-			weaponButton.style.fontWeight = 'bold';
-
-			let clickTimeout;
-
-			weaponButton.addEventListener('click', function(event) {
-				if (clickTimeout) {
-					clearTimeout(clickTimeout);
-					clickTimeout = null;
-					document.body.prepend(document.querySelector('div#dice-box'));
-					document.querySelector('div#dice-box').style.zIndex = '';
-					// Handle double click
-					overlayContainer.remove();
-					CommonActionMenuOpen = false;
-					roll_dice(damage);
-				} else {
-					clickTimeout = setTimeout(() => {
-						clickTimeout = null;
-						document.body.prepend(document.querySelector('div#dice-box'));
-						document.querySelector('div#dice-box').style.zIndex = '';
-						overlayContainer.remove();
-						CommonActionMenuOpen = false;
-						roll_dice(attackRoll, event);
-					}, 200);
-				}
-			});
-
-			actions.appendChild(weaponButton);
-		}
-	}
-
 	document.addEventListener('click', commonActionClickListener);
 
 	document.querySelectorAll('.submenu-item-button').forEach(button => {
@@ -855,6 +814,47 @@ function createCommonAction(adventureData) {
 		CommonActionMenuOpen = false;
 		roll_dice(`1d20+${spellAttack}`, event);
 	});
+
+	for (let i = 0; i < Object.keys(characterData.Inventory).length; i++) {
+		if (characterData.Inventory[i].Definition.FilterType === "Weapon" || characterData.Inventory[i].Definition.FilterType === "Rod" || characterData.Inventory[i].Definition.FilterType === "Staff") {
+			const name = characterData.Inventory[i].Definition.Name;
+			const range = "Range: " + (characterData.Inventory[i].Definition.Range || 5) + "/" + (characterData.Inventory[i].Definition.LongRange || 5) + "ft.";
+			const attackRoll = characterData.Inventory[i].Definition.AttackRoll;
+			const damage = characterData.Inventory[i].Definition.DamageRoll;
+
+			const weaponButton = document.createElement('button');
+			weaponButton.textContent = name;
+			weaponButton.title = range + " - Attack Roll: " + attackRoll + " - Damage: " + damage + " - Double click for damage roll";
+			weaponButton.classList.add('submenu-item', 'submenu-item-button', 'btn', 'btn-default', 'btn-sm');
+			weaponButton.style.fontWeight = 'bold';
+
+			let clickTimeout;
+
+			weaponButton.addEventListener('click', function (event) {
+				if (clickTimeout) {
+					clearTimeout(clickTimeout);
+					clickTimeout = null;
+					document.body.prepend(document.querySelector('div#dice-box'));
+					document.querySelector('div#dice-box').style.zIndex = '';
+					// Handle double click
+					overlayContainer.remove();
+					CommonActionMenuOpen = false;
+					roll_dice(damage);
+				} else {
+					clickTimeout = setTimeout(() => {
+						clickTimeout = null;
+						document.body.prepend(document.querySelector('div#dice-box'));
+						document.querySelector('div#dice-box').style.zIndex = '';
+						overlayContainer.remove();
+						CommonActionMenuOpen = false;
+						roll_dice(attackRoll, event);
+					}, 200);
+				}
+			});
+
+			actions.appendChild(weaponButton);
+		}
+	}
 }
 
 function addTitlesToAllButtons() {
